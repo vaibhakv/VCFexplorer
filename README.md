@@ -3,6 +3,8 @@ Author: vaibhakv
 
 # VCF Explorer Shiny App
 
+![VCF Explorer Logo](https://github.com/vaibhakv/VCFexplorer/blob/main/images/Screenshot%20from%202023-12-15%2015-26-55.png)
+
 ## Overview
 Interface for exploring and visualizing VCF files. Users can upload VCF files, choose a chromosome, and visualize the distribution of Single Nucleotide Variants (SNVs) and Insertion/Deletion variants (Indels) on the selected chromosome.
 
