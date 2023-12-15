@@ -1,9 +1,5 @@
 Author: vaibhakv
 
----
-title: "VCF Explorer Shiny App"
-output: html_document
----
 
 # VCF Explorer Shiny App
 
