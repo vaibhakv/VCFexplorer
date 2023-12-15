@@ -1,12 +1,9 @@
 library(shiny)
-library(shinyWidgets)
 library(shinydashboard)
 library(ggplot2)
 library(VariantAnnotation)
 library(Gviz)
 library(GenomicRanges)
-library(DelayedMatrixStats)
-library(sparseMatrixStats)
 
 ui <- dashboardPage(
   skin = "green",
@@ -53,39 +50,53 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$submitBtn, {
-    # Count SNVs and Indels
-    snvCount <- sum(isSNV(vcfFile()))
-    indelCount <- sum(isIndel(vcfFile()))
+    # Subsetting VCF data based on the chromosome
+    selectedChromosome <- input$chromosomeInput
+    vcfSubset <- vcfFile()[which(seqnames(vcfFile()) == selectedChromosome)]
     
-    # Create a data frame for plotting
+    # Counting SNVs and Indels for the selected chromosome
+    snvCount <- sum(isSNV(vcfSubset))
+    indelCount <- sum(isIndel(vcfSubset))
+    
+    #total
+    totalSNVs <- sum(isSNV(vcfFile()))
+    totalIndels <- sum(isIndel(vcfFile()))
+    
+    # Creating a data frame for plotting
     variantCounts <- data.frame(
       Variant = c("SNV", "Indel"),
       Count = c(snvCount, indelCount)
     )
     
-    # Plotting with updated colors
+    # Plotting 
     output$variantPlot <- renderPlot({
-      ggplot(variantCounts, aes(x = Variant, y = Count, fill = Variant)) +
+      ggplot(variantCounts, aes(x = Variant, y = Count, fill = Variant, label = Count)) +
         geom_bar(stat = "identity") +
-        labs(title = "Variant Counts", x = "Variant Type", y = "Count") +
+        geom_text(position = position_stack(vjust = 0.5), color = "white", size = 5) +
+        labs(title = paste("Variant Counts for Chromosome", selectedChromosome,
+                           "\nTotal SNVs: ", totalSNVs, "\nTotal Indels: ", totalIndels),
+             x = "Variant Type", y = "Count") +
         theme_minimal() +
         scale_fill_manual(values = c("#06A3DA", "#34AD54"))
     })
     
-    # Update the itrack based on the selected chromosome
-    selectedChromosome <- input$chromosomeInput
+    
+    # Updating the itrack based on the selected chromosome
     itrack <- IdeogramTrack(genome = "hg19", chromosome = selectedChromosome)
-    vTrack <- AnnotationTrack(rowRanges(vcfFile()))
+    vTrack <- AnnotationTrack(rowRanges(vcfSubset))
     
     output$plot3 <- renderPlot({
       plotTracks(list(itrack, vTrack))
     })
     
-    # Display sample names below the select chromosome option
+    # Displaying sample names 
     output$sampleNames <- renderText({
-      paste(samples(header(vcfFile())), collapse = ", ")
+      paste(samples(header(vcfSubset)), collapse = ", ")
     })
   })
 }
+
+
+
 
 shinyApp(ui, server)
