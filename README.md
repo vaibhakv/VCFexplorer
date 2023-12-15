@@ -14,7 +14,7 @@ Interface for exploring and visualizing VCF files. Users can upload VCF files, c
 - **Chromosome Selection:** Select the chromosome you want to explore.
 - **Variant Counts:** Visualize the counts of SNVs and Indels in a bar plot.
 - **Chromosome Visualization:** View the genomic coordinates of variants on an Ideogram.
-- **Sample Information:** Display sample names and total counts for SNVs and Indels.
+- **Sample Information:** Display sample names.
 
 ## How to Use
 
